@@ -9,8 +9,7 @@ for (let i = 0; i<persons.length; i++) balance.push(0);
 // initialize graph options
 const options = {
     edges : {
-        font: {size: 18},
-        color: 'blue'
+        font: {size: 18}
     },
     nodes:{
         fixed: false,
@@ -67,4 +66,34 @@ function addEdge(src, dest, amt) {
     balance[dest] += amt;
     balance[src] -= amt;
 
+    let {givers, takers} = createHeaps();
+    edges = createEdges(givers, takers);
+    showGraph();
+}
+
+function createHeaps() {
+    let givers = new MaxHeap();
+    let takers = new MaxHeap();
+
+    for (let i=0; i<balance.length; i++) {
+        if (balance[i] > 0) takers.insert(balance[i], i);
+        if (balance[i] < 0) givers.insert(-balance[i], i);
+    }
+    return{givers, takers};
+}
+
+function createEdges(givers, takers) {
+    let edges = [];
+    while (givers.size()) {
+        let g = givers.extractRoot(), t = takers.extractRoot();
+        let val = Math.min(g.key, t.key);
+
+        edges.push({arrows: {to : {enabled: true}}, color:'orange', from : g.value, to: t.value, label : String(val)});
+
+        g.key -= val;
+        t.key -= val;
+        if (g.key > 0) givers.insert(g);
+        if (t.key > 0) takers.insert(t);
+    }
+    return edges;
 }

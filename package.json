@@ -9,6 +9,5 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@datastructures-js/heap": "^3.1.1"
   }
 }
