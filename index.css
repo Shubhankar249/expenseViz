@@ -1,0 +1,17 @@
+html,
+body {
+    height: 100%;
+    padding: 0;
+    margin : 0;
+}
+
+#graph {
+    display: inline-block;
+    width: 65%;
+    height: 70%;
+}
+
+#transactions {
+    display: inline-block;
+    width: 25%;
+}

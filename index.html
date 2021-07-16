@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TransAct</title>
+    <script src="https://kit.fontawesome.com/76b2d5f40b.js" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <div id = "graph">
+
+    </div>
+    <div id = "transactions">
+        <ul id = "tList">
+        </ul>
+        <form id = "new-transaction">
+            <label for="from">Paid by: </label>
+            <input type="text" name="from" id = "from" placeholder="Enter Name"> <br/>
+
+            <label for="to">Paid to: </label>
+            <input type="text" name="to" id = "to" placeholder="Enter Name"> <br/>
+
+            <label for="amount">Amount: </label>
+            <input type="number" name="amount" min = "0" max = "500" id = "amount" placeholder="Amount in Rs."> <br/>
+
+            <label for="date">Date: </label>
+            <input type="date" name="date" id = "date"> <br/>
+            <button type="button" id = "add-transaction">Add the Transaction</button>
+        </form>
+    </div>
+
+    <script src="index.js"></script>
+</body>
+</html>
