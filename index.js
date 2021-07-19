@@ -1,11 +1,15 @@
 const express = require('express');
-const app = express();
+const cors = require('cors');
+const connectDB = require('./config/db');
 
 const port = 9000;
 
+const app = express();
+
+connectDB();
 app.use((req, res, next) => {setTimeout(next, 1000)});
-app.use(express.urlencoded());
 app.use(express.json());
+app.use(cors());
 app.use(express.static('public'));
 
 const transactions = [], balance = [0, 0, 0, 0, 0, 0, 0, 0, 0];
