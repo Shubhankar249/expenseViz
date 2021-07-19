@@ -51,7 +51,7 @@ class MaxHeap extends Heap {
   /**
    * Builds a max heap from an array of items
    * @public
-   * @static
+   * @public
    * @param {array} list
    * @returns {MaxHeap}
    */
@@ -62,7 +62,7 @@ class MaxHeap extends Heap {
   /**
    * Checks if a list of items is a valid max heap
    * @public
-   * @static
+   * @public
    * @param {array} list
    * @returns {boolean}
    */

@@ -345,7 +345,7 @@ class Heap {
   /**
    * Convert a list of items into a heap
    * @protected
-   * @static
+   * @public
    * @param {array} array
    * @param {class} HeapType
    * @returns {Heap}
@@ -361,7 +361,7 @@ class Heap {
   /**
    * Checks if a list of items is a valid heap
    * @protected
-   * @static
+   * @public
    * @param {array} array
    * @param {class} HeapType
    * @returns {boolean}
