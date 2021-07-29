@@ -1,9 +1,7 @@
 const addT = document.getElementById('add-transaction');
 const graph = document.getElementById('graph');
 
-const persons = ["Shubhankar", "Salik", "Resider", "Mohit", "Om", "Sanskar", "Pawan", "Aayuswa", "Rahul"];
-let balance = [], nodes = [], edges = [], transactions = [];
-
+let users = [], edges = [], transactions = [];
 
 // initialize graph options
 const options = {
@@ -27,20 +25,17 @@ const options = {
     }
 }
 
-// creating nodes
-for (let i = 0; i < persons.length; i++) nodes.push({id: i, label: persons[i]});
-nodes = new vis.DataSet(nodes);
-
 // init network
 const network = new vis.Network(graph);
 network.setOptions(options);
 
-// get balance and transaction lists
+// get users and transactions lists
 function getHome() {
     fetch('/home')
         .then(res => res.json())
         .then(res => {
-            balance = res.balance;
+            // console.log(res);
+            users = res.users;
             transactions = res.transactions;
             updateTransactions();
         })
@@ -49,12 +44,11 @@ function getHome() {
 getHome();
 
 function updateTransactions() {
-    // console.log("showTransactions called");
     let transactionList = document.getElementById('tList');
     transactionList.innerHTML = "";
     for (let transaction of transactions) {
         let li = document.createElement('li');
-        li.appendChild(document.createTextNode(`Rs. ${transaction.amt} paid to ${persons[transaction.to]} from ${persons[transaction.from]} on ${transaction.date}.`));
+        li.appendChild(document.createTextNode(`Rs. ${transaction.amt} paid to ${getUserById(transaction.to)} from ${getUserById(transaction.from)} on ${transaction.date}.`));
         transactionList.appendChild(li);
     }
 
@@ -63,53 +57,28 @@ function updateTransactions() {
     showGraph();
 }
 
-function showGraph() {  // show graph
-    let visData = {nodes: nodes, edges: edges};
-    network.setData(visData);
+function getUserById(id) {
+    for (let i of users)
+        if (i._id === id)
+            return i.name;
+    return "Left Group";
 }
 
-addT.onclick = function () {
-    let from = document.getElementById('from').value;
-    let to = document.getElementById('to').value;
-    let amt = document.getElementById('amount').value;
-    let date = document.getElementById('date').value;
-
-    let src = persons.indexOf(from);
-    let dest = persons.indexOf(to);
-    if (src === -1 || dest === -1) {
-        alert("You may have mistyped the name of your friend!");
-        return;
+function getUserByName(name) {
+    for (let i of users) {
+        if (i.name === name)
+            return i._id;
     }
-    postTransaction({from: src, to: dest, amt: amt, date: date});
+    return -1;
 }
-
-function postTransaction(transaction) {
-    console.log("posting ", transaction);
-    fetch('/transaction', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-            // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify(transaction)
-    })
-        .then(res=> res.json())
-        .then(res => {
-            balance = res.balance;
-            transactions = res.transactions;
-            updateTransactions();
-        })
-        .catch(err => console.error(err));
-}
-
 
 function createHeaps() {
     let givers = new MaxHeap();
     let takers = new MaxHeap();
 
-    for (let i=0; i<balance.length; i++) {
-        if (balance[i] > 0) takers.insert(balance[i], i);
-        if (balance[i] < 0) givers.insert(-balance[i], i);
+    for (let i of users) {
+        if (i.balance > 0) takers.insert(i.balance, i._id);
+        if (i.balance < 0) givers.insert(0 - i.balance, i._id);
     }
     return{givers, takers};
 }
@@ -128,4 +97,47 @@ function createEdges(givers, takers) {
         if (t.key > 0) takers.insert(t);
     }
     return edges;
+}
+
+addT.onclick = function () {
+    let from = document.getElementById('from').value;
+    let to = document.getElementById('to').value;
+    let amt = document.getElementById('amount').value;
+    let date = document.getElementById('date').value;
+
+    let src = getUserByName(from);
+    let dest = getUserByName(to);
+    if (src === -1 || dest === -1) {
+        alert("You may have mistyped the name of your friend!");
+        return;
+    }
+    postTransaction({from: src, to: dest, amt: amt, date: date});
+}
+
+function postTransaction(transaction) {
+    fetch('/transaction', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify(transaction)
+    })
+        .then(res=> res.json())
+        .then(res => {
+            console.log(res);
+            users = res.users;
+            transactions = res.transactions;
+            updateTransactions();
+        })
+        .catch(err => console.error(err));
+}
+
+function showGraph()    {  // show graph
+    let nodes = [];
+    for (let user of users) nodes.push({id: user._id, label: user.name});
+    nodes = new vis.DataSet(nodes);
+
+    const visData = {nodes: nodes, edges: edges};
+    network.setData(visData);
 }
