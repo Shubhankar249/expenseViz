@@ -10,8 +10,9 @@ async function checkingAuth() {
             curr_user = await res.json();
 
             document.getElementById('signed-out').style.display = "none";
-            let signedIn = document.getElementById('signed-in')
-            signedIn.style.display = "block";
+            let signedIn = document.getElementById('signed-in').style.display = "block";
+            let currUserDebt = document.getElementById('curr-user-debt').style.display = "block";
+
             let p = document.getElementById('signed-in-para');
             p.innerHTML = `Hey ${curr_user.name}`;
         }
@@ -63,16 +64,17 @@ getHome();
 
 function updateTransactions() {
     let transactionList = document.getElementById('tList');
-    transactionList.innerHTML = "";
-    for (let transaction of transactions) {
-        let li = document.createElement('li');
-        li.appendChild(document.createTextNode(`Rs. ${transaction.amt} paid to ${getUserById(transaction.to)} from ${getUserById(transaction.from)} on ${transaction.date}.`));
-        transactionList.appendChild(li);
-    }
+
+    let s = "";
+    for (let i of transactions)
+        s += `<li>Rs. ${i.amt} paid to ${getUserById(i.to)} from ${getUserById(i.from)} on ${i.date}.</li>`;
+    transactionList.innerHTML = s;
 
     let {givers, takers} = createHeaps();
     edges = createEdges(givers, takers);
     showGraph();
+
+    updateUserDebt();
 }
 
 function getUserById(id) {
@@ -158,4 +160,26 @@ function showGraph()    {  // show graph
 
     const visData = {nodes: nodes, edges: edges};
     network.setData(visData);
+}
+
+function updateUserDebt() {
+    let debts = [], balance = 0;
+    for (let i of edges) {
+        if (i.from === curr_user._id) {
+            debts.push({to: i.to, amt: i.label});
+            balance += parseInt(i.label);
+        }
+    }
+    let userBalance = document.getElementById('user-balance');
+    if (balance === 0) {
+        userBalance.innerHTML = "Rs. 0 /- Great!";
+    }else {
+        userBalance.innerHTML = `Rs. ${balance}/- to: `;
+        let debtList = document.getElementById('debt-list');
+
+        let s = "";
+        for (let i of debts)
+            s += `<li>Rs. ${i.amt} to ${getUserById(i.to)}.</li>`;
+        debtList.innerHTML = s;
+    }
 }

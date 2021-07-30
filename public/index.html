@@ -13,7 +13,7 @@
 </head>
 <body>
     <header>
-        <h1>Simplifying Transactions</h1>
+        <h1>Behold my Cash-flow Simplifyinator</h1>
         <div id = "signed-in" style="display: none">
             <p id = "signed-in-para"></p>
             <button><a href="/sign-out">Sign Out</a></button>
@@ -44,6 +44,11 @@
             <input type="date" name="date" id = "date"> <br/>
             <button type="button" id = "add-transaction">Add the Transaction</button>
         </form>
+    </div>
+
+    <div id = "curr-user-debt" style="display: none">
+        <p>You need to pay total <span id = "user-balance"></span></p>
+        <ul id = "debt-list"></ul>
     </div>
 
     <script src="js/index.js"></script>
