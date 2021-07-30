@@ -1,7 +1,25 @@
 const addT = document.getElementById('add-transaction');
 const graph = document.getElementById('graph');
 
-let users = [], edges = [], transactions = [];
+let users = [], edges = [], transactions = [], curr_user;
+
+async function checkingAuth() {
+    try {
+        const res = await fetch('/get-user');
+        if (res.status !== 204) {
+            curr_user = await res.json();
+
+            document.getElementById('signed-out').style.display = "none";
+            let signedIn = document.getElementById('signed-in')
+            signedIn.style.display = "block";
+            let p = document.getElementById('signed-in-para');
+            p.innerHTML = `Hey ${curr_user.name}`;
+        }
+    } catch (e) {
+        console.error(e);
+    }
+}checkingAuth();
+
 
 // initialize graph options
 const options = {

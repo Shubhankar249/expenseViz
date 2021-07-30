@@ -13,10 +13,10 @@ module.exports.Register = async (req, res) => {
     }
 }
 
-// module.exports.signin = function (req, res) {
-//     return res.redirect('posts');
-// }
-// module.exports.signOut = function (req, res) {
-//     req.logOut();
-//     return res.redirect('/');
-// }
+module.exports.SignIn = function (req, res) {
+    return res.redirect('/');
+}
+module.exports.SignOut = function (req, res) {
+    req.logOut();
+    return res.redirect('/');
+}
