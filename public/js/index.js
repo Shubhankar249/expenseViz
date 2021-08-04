@@ -8,19 +8,24 @@ async function checkingAuth() {
         const res = await fetch('/get-user');
         if (res.status !== 204) {
             curr_user = await res.json();
-
             document.getElementById('signed-out').style.display = "none";
-            let signedIn = document.getElementById('signed-in').style.display = "block";
-            let currUserDebt = document.getElementById('curr-user-debt').style.display = "block";
+            document.getElementById('signed-in').style.display = "block";
+            document.getElementById('curr-user-debt').style.display = "block";
 
-            let p = document.getElementById('signed-in-para');
-            p.innerHTML = `Hey ${curr_user.name}`;
+            document.getElementById('signed-in-para').innerHTML = `Hey ${curr_user.name}`;
+            updateRoomsList();
         }
     } catch (e) {
         console.error(e);
     }
 }checkingAuth();
 
+function updateRoomsList() {
+    let s = "";
+    for (const room of curr_user.rooms)
+        s += `<li onclick="getRoom('${room._id}')"><a href="#">${room.name}</a></li>`;
+    document.getElementById('room-list').innerHTML = s;
+}
 
 // initialize graph options
 const options = {
@@ -49,18 +54,18 @@ const network = new vis.Network(graph);
 network.setOptions(options);
 
 // get users and transactions lists
-function getHome() {
-    fetch('/home')
+function getRoom(e) {
+    // console.log(e);
+    fetch('/home/'+e)
         .then(res => res.json())
         .then(res => {
-            // console.log(res);
             users = res.users;
             transactions = res.transactions;
             updateTransactions();
         })
         .catch(err => console.error(err));
 }
-getHome();
+// getRoom();
 
 function updateTransactions() {
     let transactionList = document.getElementById('tList');

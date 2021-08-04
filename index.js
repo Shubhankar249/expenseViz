@@ -3,6 +3,7 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 const HomeController = require('./controllers/transactions');
 const LoginController = require('./controllers/login');
+const RoomController = require('./controllers/rooms');
 
 const passport = require('passport');
 const passportLocal = require('./config/passportLocal');
@@ -13,7 +14,7 @@ const port = 9000;
 const app = express();
 connectDB();
 
-app.use((req, res, next) => {setTimeout(next, 1000)});
+// app.use((req, res, next) => {setTimeout(next, 1000)});
 app.use(express.urlencoded());
 app.use(express.json());
 app.use(cors());
@@ -33,7 +34,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.get('/home', HomeController.Home);
+app.get('/home/:roomId', RoomController.Home);
 
 app.post('/transaction', HomeController.AddTransaction);
 
@@ -44,12 +45,14 @@ app.get('/sign-out', LoginController.SignOut);
 app.get('/get-user', (req, res) => {
     let user = req.user;
     if (user) {
-        user = {_id: user._id, name: user.name};
+        user = {_id: user._id, name: user.name, rooms: user.rooms};
         res.send(user);
         return;
     }
     res.status(204).json("Not Signed In");
 });
+
+app.post('/create-room', RoomController.Create);
 
 app.listen(port, (err) => {
     if (err) console.log(`Error starting the server ${err}`);

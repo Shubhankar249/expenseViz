@@ -1,16 +1,6 @@
-const Transactions = require('../models/transactions');
+const Transactions = require('../models/rooms');
 const Users = require('../models/users');
 
-module.exports.Home = async (req, res) => {
-    try {
-        const transactions = await Transactions.find();
-        const users = await Users.find().select('name balance');   // sending only users id(by default), name and balance
-        res.send({transactions: transactions, users: users});
-    } catch (e) {
-        console.error(e);
-        res.status(500).json({error: 'Server Error'});
-    }
-}
 
 module.exports.AddTransaction = async (req, res) => {
     let new_transaction = req.body;
