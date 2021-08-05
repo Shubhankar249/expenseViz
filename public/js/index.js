@@ -1,7 +1,7 @@
 const addT = document.getElementById('add-transaction');
 const graph = document.getElementById('graph');
 
-let users = [], edges = [], transactions = [], curr_user;
+let users = [], edges = [], transactions = [], curr_user, curr_room;
 
 async function checkingAuth() {
     try {
@@ -26,6 +26,8 @@ function updateRoomsList() {
         s += `<li onclick="getRoom('${room._id}')"><a href="#">${room.name}</a></li>`;
     document.getElementById('room-list').innerHTML = s;
 }
+
+document.getElementById('invite-button').onclick = () => navigator.clipboard.writeText(`localhost:9000/join-room/?roomId=${curr_room}`).then(() => alert("copied"));
 
 // initialize graph options
 const options = {
@@ -55,7 +57,9 @@ network.setOptions(options);
 
 // get users and transactions lists
 function getRoom(e) {
-    // console.log(e);
+    document.getElementById('invite-text').style.display = "block";
+    curr_room = e;
+
     fetch('/home/'+e)
         .then(res => res.json())
         .then(res => {
@@ -140,13 +144,14 @@ addT.onclick = function () {
 }
 
 function postTransaction(transaction) {
+    const data = {transaction: transaction, roomId: curr_room};
     fetch('/transaction', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
             // 'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: JSON.stringify(transaction)
+        body: JSON.stringify(data)
     })
         .then(res=> res.json())
         .then(res => {

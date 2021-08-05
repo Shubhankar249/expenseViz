@@ -29,6 +29,18 @@ module.exports.Home = async (req, res) => {
 
 module.exports.Join = async (req, res) => {
     try {
+        const isRoomAdded = () => {
+            for (const room of req.user.rooms)
+                if (room._id == req.query.roomId) return true;
+
+            return false;
+        };
+
+        if (isRoomAdded()) {
+            res.redirect('/');
+            return;
+        }
+
         const room = await Rooms.findByIdAndUpdate(req.query.roomId, {$push : {members : req.user._id}});
         if (!room) {
             res.status(204).json({msg: "Not Found"});

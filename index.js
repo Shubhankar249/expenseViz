@@ -34,8 +34,6 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.get('/home/:roomId', RoomController.Home);
-
 app.post('/transaction', HomeController.AddTransaction);
 
 app.post('/register', LoginController.Register);
@@ -52,6 +50,7 @@ app.get('/get-user', (req, res) => {
     res.status(204).json("Not Signed In");
 });
 
+app.get('/home/:roomId', RoomController.Home);
 app.post('/create-room', RoomController.Create);
 app.get('/join-room/', RoomController.Join);
 
