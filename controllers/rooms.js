@@ -12,12 +12,30 @@ module.exports.Create = async (req, res) => {
     }
 }
 
-
 module.exports.Home = async (req, res) => {
     try {
         const room = await Rooms.findById(req.params.roomId).select('members transactions');
-        const users = await Users.find({_id : {$in: [room.members]}}).select('name balance');   // sending only users id(by default), name and balance
+        let users = [];
+        for (const member of room.members) {
+            const user = await Users.findById(member).select('name balance');
+            users.push(user);
+        }
         res.send({transactions: room.transactions, users: users});
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({error: 'Server Error'});
+    }
+}
+
+module.exports.Join = async (req, res) => {
+    try {
+        const room = await Rooms.findByIdAndUpdate(req.query.roomId, {$push : {members : req.user._id}});
+        if (!room) {
+            res.status(204).json({msg: "Not Found"});
+            return;
+        }
+        await Users.findByIdAndUpdate(req.user._id, {$push: {rooms: {name: room.name, _id: room._id}}});
+        res.redirect('/');
     } catch (e) {
         console.error(e);
         res.status(500).json({error: 'Server Error'});

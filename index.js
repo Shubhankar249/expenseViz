@@ -53,6 +53,7 @@ app.get('/get-user', (req, res) => {
 });
 
 app.post('/create-room', RoomController.Create);
+app.get('/join-room/', RoomController.Join);
 
 app.listen(port, (err) => {
     if (err) console.log(`Error starting the server ${err}`);
