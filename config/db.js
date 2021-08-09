@@ -7,6 +7,7 @@ const connectDB = async () => {
             useCreateIndex: true,
             useUnifiedTopology: true
         });
+        // await connect.connection.db.dropDatabase();
         console.log('Connected ' + connect.connection.host);
     } catch (e) {
         console.error(e);

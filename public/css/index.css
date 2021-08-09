@@ -5,6 +5,10 @@ body {
     margin : 0;
 }
 
+a {
+    text-decoration: none;
+}
+
 #graph {
     display: inline-block;
     width: 65%;

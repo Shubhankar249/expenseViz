@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const UserRoomsSchema = new mongoose.Schema({
-    name : {type: String, required: true}
+    name : {type: String, required: true},
 });
 
 const UserSchema = new mongoose.Schema({
@@ -17,10 +17,6 @@ const UserSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
-    },
-    balance: {
-        type:Number,
-        default: 0
     },
     rooms : [UserRoomsSchema]
 }, {timestamps: true});

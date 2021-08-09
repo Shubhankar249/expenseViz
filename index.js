@@ -1,7 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
-const HomeController = require('./controllers/transactions');
 const LoginController = require('./controllers/login');
 const RoomController = require('./controllers/rooms');
 
@@ -34,7 +33,6 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.post('/transaction', HomeController.AddTransaction);
 
 app.post('/register', LoginController.Register);
 app.post('/sign-in', passport.authenticate('local', {failureRedirect: 'back'}), LoginController.SignIn);
@@ -53,6 +51,7 @@ app.get('/get-user', (req, res) => {
 app.get('/home/:roomId', RoomController.Home);
 app.post('/create-room', RoomController.Create);
 app.get('/join-room/', RoomController.Join);
+app.post('/transaction', RoomController.AddTransaction);
 
 app.listen(port, (err) => {
     if (err) console.log(`Error starting the server ${err}`);

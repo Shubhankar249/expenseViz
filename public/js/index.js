@@ -63,7 +63,7 @@ function getRoom(e) {
     fetch('/home/'+e)
         .then(res => res.json())
         .then(res => {
-            users = res.users;
+            users = res.members;
             transactions = res.transactions;
             updateTransactions();
         })
@@ -156,7 +156,7 @@ function postTransaction(transaction) {
         .then(res=> res.json())
         .then(res => {
             console.log(res);
-            users = res.users;
+            users = res.members;
             transactions = res.transactions;
             updateTransactions();
         })

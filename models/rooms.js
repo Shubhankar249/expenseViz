@@ -18,9 +18,14 @@ const TransactionSchema = new mongoose.Schema({
     }
 });
 
+const MemberSchema = new mongoose.Schema({
+    name : String,
+    balance: {type: Number, default: 0}
+})
+
 const RoomSchema = new mongoose.Schema({
     name : {type: String, required: true},
-    members : [String],
+    members : [MemberSchema],
     transactions : [TransactionSchema],
 }, {timestamps: true});
 
