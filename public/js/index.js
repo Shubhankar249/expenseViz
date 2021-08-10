@@ -181,11 +181,13 @@ function updateUserDebt() {
         }
     }
     let userBalance = document.getElementById('user-balance');
+    let debtList = document.getElementById('debt-list');
+
     if (balance === 0) {
         userBalance.innerHTML = "Rs. 0 /- Great!";
+        debtList.innerHTML = "";
     }else {
         userBalance.innerHTML = `Rs. ${balance}/- to: `;
-        let debtList = document.getElementById('debt-list');
 
         let s = "";
         for (let i of debts)
