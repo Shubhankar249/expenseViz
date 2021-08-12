@@ -26,13 +26,12 @@ app.use(session({
     resave: false,
     cookie: {maxAge: 1000 * 60 * 100},   // this cookie will expire in 100min
     store: new MongoStore({
-        mongoUrl: process.env.MONGO_URI,
+        mongoUrl: "mongodb+srv://testUser:testPass@cluster0.njsgk.mongodb.net/test?retryWrites=true&w=majority",
         autoRemove: 'false'
     })
 }));
 app.use(passport.initialize());
 app.use(passport.session());
-
 
 app.post('/register', LoginController.Register);
 app.post('/sign-in', passport.authenticate('local', {failureRedirect: 'back'}), LoginController.SignIn);
@@ -53,7 +52,7 @@ app.post('/create-room', RoomController.Create);
 app.get('/join-room/', RoomController.Join);
 app.post('/transaction', RoomController.AddTransaction);
 
-app.listen(port, (err) => {
+app.listen(port || process.env.PORT, (err) => {
     if (err) console.log(`Error starting the server ${err}`);
     console.log(`Server is running on localhost:${port}`);
 })
