@@ -27,7 +27,7 @@ function updateRoomsList() {
     document.getElementById('room-list').innerHTML = s;
 }
 
-document.getElementById('invite-button').onclick = () => navigator.clipboard.writeText(`localhost:9000/join-room/?roomId=${curr_room}`).then(() => alert("copied"));
+document.getElementById('invite-button').onclick = () => navigator.clipboard.writeText(`https://expenseviz.herokuapp.com/join-room/?roomId=${curr_room}`).then(() => alert("copied"));
 
 // initialize graph options
 const options = {
