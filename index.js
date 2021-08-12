@@ -52,7 +52,7 @@ app.post('/create-room', RoomController.Create);
 app.get('/join-room/', RoomController.Join);
 app.post('/transaction', RoomController.AddTransaction);
 
-app.listen(port || process.env.PORT, (err) => {
+app.listen(process.env.PORT || port , (err) => {
     if (err) console.log(`Error starting the server ${err}`);
     console.log(`Server is running on localhost:${port}`);
 })
