@@ -24,9 +24,9 @@ app.use(session({
     secret: 'HashFunction',    // cookie is encrypted using this key
     saveUninitialized: false,
     resave: false,
-    cookie: {maxAge: 1000 * 60 * 100},   // this cookie will expire in 100min
+    cookie: {maxAge: 1000 * 60 * 60 * 24 * 30},   // this cookie will expire in 30days
     store: new MongoStore({
-        mongoUrl: "mongodb+srv://testUser:testPass@cluster0.njsgk.mongodb.net/test?retryWrites=true&w=majority",
+        mongoUrl: process.env.MONGO_URI,
         autoRemove: 'false'
     })
 }));

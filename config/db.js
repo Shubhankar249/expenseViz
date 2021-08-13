@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const uri = "mongodb+srv://testUser:testPass@cluster0.njsgk.mongodb.net/test?retryWrites=true&w=majority";
+const uri = process.env.MONGO_URI;
 const connectDB = async () => {
     try {
         const connect = await mongoose.connect(uri, {
