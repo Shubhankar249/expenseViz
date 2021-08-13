@@ -68,15 +68,16 @@ module.exports.AddTransaction = async (req, res) => {
         const room = await Rooms.findById(roomId);
         room.transactions.push(new_transaction);
 
-        const updateMember = (members, id, amt) => {
+        const updateMember = (members, id, amt, val = 1) => {
             for (let member of members)
                 if (member._id == id)
-                    member.balance += parseInt(amt);
+                    member.balance += parseInt(amt) / val;
         }
 
-        updateMember(room.members, new_transaction.from, -new_transaction.amt);
-        updateMember(room.members, new_transaction.to, new_transaction.amt);
+        updateMember(room.members, new_transaction.from, new_transaction.amt);
+        for (let m of new_transaction.to) updateMember(room.members, m, -new_transaction.amt, new_transaction.to.length);
         room.save();
+
         res.redirect('/home/'+roomId);
     }catch (e) {
         console.error(e);

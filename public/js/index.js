@@ -66,18 +66,22 @@ function getRoom(e) {
             users = res.members;
             transactions = res.transactions;
             updateTransactions();
+            createForm();
         })
         .catch(err => console.error(err));
 }
 // getRoom();
 
 function updateTransactions() {
-    let transactionList = document.getElementById('tList');
-
+    // console.log(transactions);
     let s = "";
-    for (let i of transactions)
-        s += `<li>Rs. ${i.amt} paid to ${getUserById(i.to)} from ${getUserById(i.from)} on ${i.date}.</li>`;
-    transactionList.innerHTML = s;
+    for (let i of transactions) {
+        let dest = i.to.map(x => " " + getUserById(x));
+
+        dest.join(',');
+        s += `<li>Rs. ${i.amt} paid to${dest} from ${getUserById(i.from)} on ${i.date}.</li>`;
+    }
+    document.getElementById('tList').innerHTML = s;
 
     let {givers, takers} = createHeaps();
     edges = createEdges(givers, takers);
@@ -86,19 +90,24 @@ function updateTransactions() {
     updateUserDebt();
 }
 
+function createForm() {
+    document.getElementById('new-transaction').style.display = "block";
+    let s = "";
+    for (let i of users)
+        s += `<option value="${i._id}">${i.name}</option>`;
+    document.getElementById('from').innerHTML = s;
+
+    s = "";
+    for (let i of users)
+        s += `<input type="checkbox" id = "to-${i._id}" value="${i._id}"> <label for="to-${i._id}">${i.name}</label>`;
+    document.getElementById('to').innerHTML = s;
+}
+
 function getUserById(id) {
     for (let i of users)
         if (i._id === id)
             return i.name;
     return "Left Group";
-}
-
-function getUserByName(name) {
-    for (let i of users) {
-        if (i.name === name)
-            return i._id;
-    }
-    return -1;
 }
 
 function createHeaps() {
@@ -130,17 +139,18 @@ function createEdges(givers, takers) {
 
 addT.onclick = function () {
     let from = document.getElementById('from').value;
-    let to = document.getElementById('to').value;
+    let to = document.getElementById('to');
+    let tos = [];
+    for (const t of to.children) {
+        if (t.tagName === 'INPUT' && t.checked === true) {
+            tos.push(t.value);
+        }
+    }
+
     let amt = document.getElementById('amount').value;
     let date = document.getElementById('date').value;
 
-    let src = getUserByName(from);
-    let dest = getUserByName(to);
-    if (src === -1 || dest === -1) {
-        alert("You may have mistyped the name of your friend!");
-        return;
-    }
-    postTransaction({from: src, to: dest, amt: amt, date: date});
+    postTransaction({from: from, to: tos, amt: amt, date: date});
 }
 
 function postTransaction(transaction) {
