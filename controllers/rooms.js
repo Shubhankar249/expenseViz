@@ -63,6 +63,7 @@ module.exports.Join = async (req, res) => {
 // Redirect '/home/roomId'
 module.exports.AddTransaction = async (req, res) => {
     const new_transaction = req.body.transaction;
+    // console.log(new_transaction);
     const roomId = req.body.roomId;
     try {
         const room = await Rooms.findById(roomId);
@@ -76,7 +77,7 @@ module.exports.AddTransaction = async (req, res) => {
 
         updateMember(room.members, new_transaction.from, new_transaction.amt);
         for (let m of new_transaction.to) updateMember(room.members, m, -new_transaction.amt, new_transaction.to.length);
-        room.save();
+        await room.save();
 
         res.redirect('/home/'+roomId);
     }catch (e) {

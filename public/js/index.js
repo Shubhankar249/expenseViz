@@ -123,11 +123,11 @@ function createHeaps() {
 
 function createEdges(givers, takers) {
     let edges = [];
-    while (givers.size()) {
+    while (givers.size() && takers.size()) {
         let g = givers.extractRoot(), t = takers.extractRoot();
         let val = Math.min(g.key, t.key);
 
-        edges.push({arrows: {to : {enabled: true}}, color:'orange', from : g.value, to: t.value, label : String(val)});
+        edges.push({arrows: {to : {enabled: true}}, color:'orange', from : g.value, to: t.value, label : String(Math.floor(val))});
 
         g.key -= val;
         t.key -= val;
@@ -165,7 +165,7 @@ function postTransaction(transaction) {
     })
         .then(res=> res.json())
         .then(res => {
-            console.log(res);
+            // console.log(res);
             users = res.members;
             transactions = res.transactions;
             updateTransactions();
