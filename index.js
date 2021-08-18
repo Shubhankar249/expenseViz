@@ -17,7 +17,6 @@ connectDB();
 app.use(express.urlencoded());
 app.use(express.json());
 app.use(cors());
-app.use(express.static('public'));
 
 app.use(session({
     name: 'expenseViz', // name of the key
@@ -30,8 +29,12 @@ app.use(session({
         autoRemove: 'false'
     })
 }));
+
 app.use(passport.initialize());
 app.use(passport.session());
+
+
+app.use(express.static('public'));
 
 app.post('/register', LoginController.Register);
 app.post('/sign-in', passport.authenticate('local', {failureRedirect: 'back'}), LoginController.SignIn);
