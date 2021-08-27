@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ExpenseViz</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
     <script src="https://kit.fontawesome.com/76b2d5f40b.js" crossorigin="anonymous"></script>
     <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
@@ -12,55 +13,91 @@
 
     <link rel="stylesheet" href="css/index.css">
 </head>
-<body>
-    <header>
-        <h1>Behold my Cash-flow Simplifyinator</h1>
-        <div id = "signed-in" style="display: none">
-            <div id = "rooms">
-                <a href="./room.html"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>
-                <ul id = "room-list">
-                </ul>
+<body class="bg-light">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">Expense Viz</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbar">
+            <div class="navbar-nav me-auto mb-2 mb-md-0" id = "room-list">
             </div>
-
-            <p id = "signed-in-para"></p>
-            <p id="invite-text" style="display: none"> Want to invite someone? Click to<button id = "invite-button" > copy code</button> <br/>
-            <button><a href="/sign-out">Sign Out</a></button>
+            <a href = "/sign-out" class="btn btn-outline-success" type="button">Sign Out</a>
         </div>
-        <div id = "signed-out">
-        <button><a href="./signin.html">Sign In</a></button>
+    </div>
+</nav>
+
+<div class="px-4 py-5 my-5 text-center" id = "home">
+    <h1 class="display-5 fw-bold">Hi! <span id = "user-name"></span></h1>
+    <div class="col-md-6 mx-auto">
+        <p class="lead mb-4"> You can choose to travel to your current rooms from the navbar above. Or you can add a new one.<br/>
+            You can also copy the invite link shared by your friend in the address bar.</p>
+    </div>
+    <div class="container">
+        <div class="row mt-6">
+            <div class="col-md-5 m-2 p-2 bg-primary text-white rounded">
+                <h1 class="m-2">Create a new Room</h1>
+                <form class="p-2 row" action="/create-room" method="post">
+                    <div class="col-6"><input type="text" class="form-control" name="name" placeholder="Enter Room's Name"></div>
+                    <button type="submit" class="btn btn-outline-light col-4 mx-auto"> Create </button>
+                </form>
+            </div>
+            <div class="col-md-5 m-2 p-2 bg-info text-dark rounded">
+                <h1 class="m-2">Join an existing Room</h1>
+                <form class="p-2 row" action="/join-room" method="get">
+                    <div class="col-6"><input type="text" class="form-control" name="roomId" placeholder="Enter the room's code"></div>
+                    <button type="submit" class="btn btn-outline-dark col-4 mx-auto"> Join </button>
+                </form>
+            </div>
         </div>
-    </header>
-
-    <div id = "graph"></div>
-
-    <div id = "transactions">
-        <ul id = "tList">
-        </ul>
-        <form id = "new-transaction" style="display: none">
-            <label for="from">Paid by: </label>
-            <select name="from" id = "from"> </select> <br/>
-
-            <p>Paid To</p><div id = "to"></div>
-
-<!--            <label for="to">Paid to: </label>-->
-<!--            <input type="text" name="to" id = "to" placeholder="Enter Name"> <br/>-->
-
-            <label for="amount">Amount: </label>
-            <input type="number" name="amount" min = "0" max = "500" id = "amount" placeholder="Amount in Rs."> <br/>
-
-            <label for="date">Date: </label>
-            <input type="date" name="date" id = "date"> <br/>
-            <button type="button" id = "add-transaction">Add the Transaction</button>
-        </form>
     </div>
+</div>
 
-    <div id = "curr-user-debt" style="display: none">
-        <p>You need to pay total <span id = "user-balance"></span></p>
-        <ul id = "debt-list"></ul>
+<div class="container-fluid mt-4" id = "room" style="display: none">
+    <div class="row">
+        <div class="col-lg-8" id = "graph" style="height: 90vh"></div>
+
+        <div class="col-lg-4" id = "transactions">
+            <h1 class="text-center">Transactions</h1>
+            <ul id = "tList" class="list-group list-group-flush"></ul>
+
+            <form id = "new-transaction" class="p-2">
+                <h2 class="text-center my-3">Add a new Transaction</h2>
+                <div class="row mb-2">
+                    <label class="col-md-4" for="from"><strong> Paid By </strong></label>
+                    <div class="col-md-8">
+                        <select class="form-select" name="from" id = "from"></select>
+                    </div>
+                </div>
+
+                <div class="row mb-2">
+                    <label class="col-md-4" for="to"><strong> Paid To </strong></label>
+                    <div id = "to" class="mt-1 form-check form-check-inline"></div>
+                </div>
+
+                <div class="row mb-2">
+                    <label class="col-md-4" for="amount"><strong> Amount </strong></label>
+                    <div class="col-md-8">
+                        <input type="number" class="form-control" name="amount" min = "0" id = "amount" placeholder="Amount in Rs." required>
+                    </div>
+                </div>
+
+                <div class="row mb-2">
+                    <label class="col-md-4" for="date"><strong> Date </strong></label>
+                    <div class="col-md-8">
+                        <input type="date" class="form-control" name="date" id = "date">
+                    </div>
+                </div>
+                <div class="text-center mt-4">
+                    <button type="button" class="btn btn-dark" id = "add-transaction">Add</button>
+                </div>
+            </form>
+        </div>
+
     </div>
-
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
-    <script src="js/index.js"></script>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
+<script src="js/index.js"></script>
 </body>
 </html>

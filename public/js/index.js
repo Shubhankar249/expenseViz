@@ -1,4 +1,3 @@
-const addT = document.getElementById('add-transaction');
 const graph = document.getElementById('graph');
 
 let users = [], edges = [], transactions = [], curr_user, curr_room;
@@ -8,11 +7,7 @@ async function checkingAuth() {
         const res = await fetch('/get-user');
         if (res.status !== 204) {
             curr_user = await res.json();
-            document.getElementById('signed-out').style.display = "none";
-            document.getElementById('signed-in').style.display = "block";
-            document.getElementById('curr-user-debt').style.display = "block";
-
-            document.getElementById('signed-in-para').innerHTML = `Hey ${curr_user.name}`;
+            document.getElementById('user-name').innerHTML = curr_user.name;
             updateRoomsList();
         }
     } catch (e) {
@@ -23,31 +18,30 @@ async function checkingAuth() {
 function updateRoomsList() {
     let s = "";
     for (const room of curr_user.rooms)
-        s += `<li onclick="getRoom('${room._id}')"><a href="#">${room.name}</a></li>`;
+        s += `<a id = "${room._id}" class="nav-link" href="#" onclick="getRoom('${room._id}')">${room.name}</a>`;
     document.getElementById('room-list').innerHTML = s;
 }
-
-document.getElementById('invite-button').onclick = () => navigator.clipboard.writeText(`https://expenseviz.herokuapp.com/join-room/?roomId=${curr_room}`).then(() => alert("copied"));
-
+//
+// document.getElementById('invite-button').onclick = () => navigator.clipboard.writeText(`https://expenseviz.herokuapp.com/join-room/?roomId=${curr_room}`).then(() => alert("copied"));
+//
 // initialize graph options
 const options = {
     edges : {
-        font: {size: 18}
+        font: {size: 22}
     },
     nodes:{
         fixed: false,
-        font: '16px sans-serif black',
+        font: '20px arial black',
         scaling: {
             label: true
         },
         shape : 'icon',
         icon : {
             face : 'FontAwesome',
-            code : '\uf29d',
-            size : 40,
+            code : '\uf406',
+            size : 28,
             color : 'black'
-        },
-        shadow: true
+        }
     }
 }
 
@@ -57,12 +51,15 @@ network.setOptions(options);
 
 // get users and transactions lists
 function getRoom(e) {
-    document.getElementById('invite-text').style.display = "block";
     curr_room = e;
+    updateRoomsList();
+    document.getElementById('home').style.display = "none";
+    document.getElementById(curr_room).className += " active";
 
     fetch('/home/'+e)
         .then(res => res.json())
         .then(res => {
+            document.getElementById('room').style.display = "block";
             users = res.members;
             transactions = res.transactions;
             updateTransactions();
@@ -70,16 +67,19 @@ function getRoom(e) {
         })
         .catch(err => console.error(err));
 }
-// getRoom();
 
 function updateTransactions() {
-    // console.log(transactions);
+    transactions.sort((a, b) => a.date > b.date ? -1 : 1);
+
     let s = "";
     for (let i of transactions) {
         let dest = i.to.map(x => " " + getUserById(x));
 
         dest.join(',');
-        s += `<li>Rs. ${i.amt} paid to${dest} from ${getUserById(i.from)} on ${i.date}.</li>`;
+        let date = new Date(i.date);
+        date = date.toDateString();
+
+        s += `<li class="list-group-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="${date}"><strong>Rs. ${i.amt}:</strong> ${getUserById(i.from)} <i class="fas fa-arrow-right"></i> ${dest}</li>`;
     }
     document.getElementById('tList').innerHTML = s;
 
@@ -87,11 +87,10 @@ function updateTransactions() {
     edges = createEdges(givers, takers);
     showGraph();
 
-    updateUserDebt();
+    // updateUserDebt();
 }
 
 function createForm() {
-    document.getElementById('new-transaction').style.display = "block";
     let s = "";
     for (let i of users)
         s += `<option value="${i._id}">${i.name}</option>`;
@@ -99,7 +98,7 @@ function createForm() {
 
     s = "";
     for (let i of users)
-        s += `<input type="checkbox" id = "to-${i._id}" value="${i._id}"> <label for="to-${i._id}">${i.name}</label>`;
+        s += `<input type="checkbox" class="btn-check" autocomplete="off" id = "to-${i._id}" value="${i._id}"> <label class="btn btn-outline-primary btn-sm m-1" for="to-${i._id}">${i.name}</label>`;
     document.getElementById('to').innerHTML = s;
 }
 
@@ -127,7 +126,7 @@ function createEdges(givers, takers) {
         let g = givers.extractRoot(), t = takers.extractRoot();
         let val = Math.min(g.key, t.key);
 
-        edges.push({arrows: {to : {enabled: true}}, color:'orange', from : g.value, to: t.value, label : String(Math.floor(val))});
+        edges.push({arrows: {to : {enabled: true}}, color:'grey', from : g.value, to: t.value, label : String(Math.floor(val))});
 
         g.key -= val;
         t.key -= val;
@@ -137,7 +136,7 @@ function createEdges(givers, takers) {
     return edges;
 }
 
-addT.onclick = function () {
+document.getElementById('add-transaction').addEventListener('click', () => {
     let from = document.getElementById('from').value;
     let to = document.getElementById('to');
     let tos = [];
@@ -146,12 +145,16 @@ addT.onclick = function () {
             tos.push(t.value);
         }
     }
+    if (tos.length === 0) {
+        alert('You have not selected a receiver');
+        return;
+    }
 
     let amt = document.getElementById('amount').value;
     let date = document.getElementById('date').value;
 
     postTransaction({from: from, to: tos, amt: amt, date: date});
-}
+});
 
 function postTransaction(transaction) {
     const data = {transaction: transaction, roomId: curr_room};
@@ -182,26 +185,26 @@ function showGraph()    {  // show graph
     network.setData(visData);
 }
 
-function updateUserDebt() {
-    let debts = [], balance = 0;
-    for (let i of edges) {
-        if (i.from === curr_user._id) {
-            debts.push({to: i.to, amt: i.label});
-            balance += parseInt(i.label);
-        }
-    }
-    let userBalance = document.getElementById('user-balance');
-    let debtList = document.getElementById('debt-list');
-
-    if (balance === 0) {
-        userBalance.innerHTML = "Rs. 0 /- Great!";
-        debtList.innerHTML = "";
-    }else {
-        userBalance.innerHTML = `Rs. ${balance}/- to: `;
-
-        let s = "";
-        for (let i of debts)
-            s += `<li>Rs. ${i.amt} to ${getUserById(i.to)}.</li>`;
-        debtList.innerHTML = s;
-    }
-}
+// function updateUserDebt() {
+//     let debts = [], balance = 0;
+//     for (let i of edges) {
+//         if (i.from === curr_user._id) {
+//             debts.push({to: i.to, amt: i.label});
+//             balance += parseInt(i.label);
+//         }
+//     }
+//     let userBalance = document.getElementById('user-balance');
+//     let debtList = document.getElementById('debt-list');
+//
+//     if (balance === 0) {
+//         userBalance.innerHTML = "Rs. 0 /- Great!";
+//         debtList.innerHTML = "";
+//     }else {
+//         userBalance.innerHTML = `Rs. ${balance}/- to: `;
+//
+//         let s = "";
+//         for (let i of debts)
+//             s += `<li>Rs. ${i.amt} to ${getUserById(i.to)}.</li>`;
+//         debtList.innerHTML = s;
+//     }
+// }

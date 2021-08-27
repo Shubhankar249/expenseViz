@@ -1,21 +1,10 @@
-html,
-body {
-    height: 100%;
-    padding: 0;
-    margin : 0;
+#tList {
+    height: 45vh;
+    overflow: scroll;
 }
 
-a {
-    text-decoration: none;
-}
-
-#graph {
-    display: inline-block;
-    width: 65%;
-    height: 70%;
-}
-
-#transactions {
-    display: inline-block;
-    width: 25%;
+#tList li {
+    background: #0dcaf0;
+    margin: 1%;
+    color: #212529;
 }

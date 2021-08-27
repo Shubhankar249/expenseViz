@@ -7,7 +7,7 @@ passport.use(new LocalStrategy({
         usernameField: 'email'
     },
      function (email, password, done) { // verifying the user with passed on info from post req during sign-in
-         User.findOne({email: email}, function (err, user) {
+    User.findOne({email: email}, function (err, user) {
             if (err) {
                 console.error(err);
                 return done(err);

@@ -1,25 +1,27 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Room | ExpenseViz</title>
 </head>
 <body>
-<h1>Create a new Room</h1>
+<header>
+    <h1>Behold my Cash-flow Simplifyinator</h1>
+    <div id = "signed-in" style="display: none">
 
-<form action="/create-room" method="post">
-  <p>Choose a cool name for your group</p>
-  <input type="text" name="name" placeholder="Enter name"> <br/>
-  <button type="submit"> Create </button>
-</form>
-<h1>Join an existing Room</h1>
+        <p id = "signed-in-para"></p>
+        <p id="invite-text" style="display: none"> Want to invite someone? Click to<button id = "invite-button" > copy code</button> <br/>
 
-<form action="/join-room" method="get">
-  <input type="text" name="roomId" placeholder="Enter the room's code"> <br/>
-  <button type="submit"> Join </button>
-</form>
+    </div>
+</header>
+
+
+
+<div id = "curr-user-debt" style="display: none">
+    <p>You need to pay total <span id = "user-balance"></span></p>
+    <ul id = "debt-list"></ul>
+</div>
 
 </body>
 </html>

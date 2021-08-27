@@ -13,7 +13,7 @@ const port = 9000;
 const app = express();
 connectDB();
 
-// app.use((req, res, next) => {setTimeout(next, 1000)});
+// app.use((req, res, next) => {setTimeout(next, 0)});
 app.use(express.urlencoded());
 app.use(express.json());
 app.use(cors());
@@ -33,11 +33,15 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.post('/sign-in', passport.authenticate('local', {failureRedirect: 'back'}), LoginController.SignIn);
+app.post('/register', LoginController.Register);
 
+app.use('/', (req, res, next) => {
+    if (req.user) next();
+    else res.sendFile(__dirname + '/public/signin.html');
+});
 app.use(express.static('public'));
 
-app.post('/register', LoginController.Register);
-app.post('/sign-in', passport.authenticate('local', {failureRedirect: 'back'}), LoginController.SignIn);
 app.get('/sign-out', LoginController.SignOut);
 
 app.get('/get-user', (req, res) => {
