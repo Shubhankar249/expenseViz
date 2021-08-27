@@ -1,6 +1,7 @@
 const graph = document.getElementById('graph');
+const toggleGraph = document.getElementById('show-transaction-button');
 
-let users = [], edges = [], transactions = [], curr_user, curr_room;
+let users = [], edges = [], transactions = [], curr_user, curr_room, isGraphVisible = true;
 
 async function checkingAuth() {
     try {
@@ -21,9 +22,17 @@ function updateRoomsList() {
         s += `<a id = "${room._id}" class="nav-link" href="#" onclick="getRoom('${room._id}')">${room.name}</a>`;
     document.getElementById('room-list').innerHTML = s;
 }
-//
-// document.getElementById('invite-button').onclick = () => navigator.clipboard.writeText(`https://expenseviz.herokuapp.com/join-room/?roomId=${curr_room}`).then(() => alert("copied"));
-//
+
+// Copy Invite Link
+document.getElementById('invite-button').onclick = () => navigator.clipboard.writeText(`https://expenseviz.herokuapp.com/join-room/?roomId=${curr_room}`).then(() => {});
+
+// Hide graph on mobile devices because of scrolling issue
+toggleGraph.onclick = () => {
+    graph.style.display = isGraphVisible ? "none" : "block";
+    toggleGraph.innerText = isGraphVisible ? "Graph" : "Transactions";
+    isGraphVisible = !isGraphVisible;
+}
+
 // initialize graph options
 const options = {
     edges : {
@@ -60,6 +69,7 @@ function getRoom(e) {
         .then(res => res.json())
         .then(res => {
             document.getElementById('room').style.display = "block";
+            document.getElementById('room-helpers').style.display = "block";
             users = res.members;
             transactions = res.transactions;
             updateTransactions();
@@ -87,7 +97,7 @@ function updateTransactions() {
     edges = createEdges(givers, takers);
     showGraph();
 
-    // updateUserDebt();
+    updateUserDebt();
 }
 
 function createForm() {
@@ -126,7 +136,7 @@ function createEdges(givers, takers) {
         let g = givers.extractRoot(), t = takers.extractRoot();
         let val = Math.min(g.key, t.key);
 
-        edges.push({arrows: {to : {enabled: true}}, color:'grey', from : g.value, to: t.value, label : String(Math.floor(val))});
+        if (val >= 1) edges.push({arrows: {to : {enabled: true}}, color:'grey', from : g.value, to: t.value, label : String(Math.floor(val))});
 
         g.key -= val;
         t.key -= val;
@@ -185,26 +195,26 @@ function showGraph()    {  // show graph
     network.setData(visData);
 }
 
-// function updateUserDebt() {
-//     let debts = [], balance = 0;
-//     for (let i of edges) {
-//         if (i.from === curr_user._id) {
-//             debts.push({to: i.to, amt: i.label});
-//             balance += parseInt(i.label);
-//         }
-//     }
-//     let userBalance = document.getElementById('user-balance');
-//     let debtList = document.getElementById('debt-list');
-//
-//     if (balance === 0) {
-//         userBalance.innerHTML = "Rs. 0 /- Great!";
-//         debtList.innerHTML = "";
-//     }else {
-//         userBalance.innerHTML = `Rs. ${balance}/- to: `;
-//
-//         let s = "";
-//         for (let i of debts)
-//             s += `<li>Rs. ${i.amt} to ${getUserById(i.to)}.</li>`;
-//         debtList.innerHTML = s;
-//     }
-// }
+function updateUserDebt() {
+    let debts = [], balance = 0;
+    for (let i of edges) {
+        if (i.from === curr_user._id) {
+            debts.push({to: i.to, amt: i.label});
+            balance += parseInt(i.label);
+        }
+    }
+    let userBalance = document.getElementById('user-balance');
+    let debtList = document.getElementById('debt-list');
+
+    if (balance === 0) {
+        userBalance.innerHTML = "Rs. 0 /- Great!";
+        debtList.innerHTML = "";
+    }else {
+        userBalance.innerHTML = `Rs. ${balance}/- to: `;
+
+        let s = "";
+        for (let i of debts)
+            s += `<li class="list-group-item">Rs. ${i.amt} to ${getUserById(i.to)}.</li>`;
+        debtList.innerHTML = s;
+    }
+}

@@ -8,3 +8,9 @@
     margin: 1%;
     color: #212529;
 }
+
+#debt-list li {
+    background: #ffe69c;
+    margin: 0.5%;
+    font-weight: bolder;
+}
